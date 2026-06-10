@@ -50,16 +50,18 @@ class TestJavaPathResolution(TestCase):
 
     @patch('tlaplus_jupyter.kernel.shutil.which', return_value='/usr/bin/java')
     def test_prefers_java_from_path(self, _):
-        kernel = TLAPlusKernel()
-        self.assertEqual(kernel.java_command()[0], '/usr/bin/java')
+        with patch.dict(os.environ, {'JAVA_HOME': '/opt/jdk'}):
+            kernel = TLAPlusKernel()
+            self.assertEqual(kernel.java_command()[0], '/usr/bin/java')
 
     @patch('tlaplus_jupyter.kernel.shutil.which', return_value=None)
-    @patch('tlaplus_jupyter.kernel.os.access', side_effect=lambda _, mode: mode == os.X_OK)
+    @patch('tlaplus_jupyter.kernel.os.access', return_value=True)
     @patch('tlaplus_jupyter.kernel.os.path.isfile', return_value=True)
-    def test_uses_java_home_when_path_missing(self, *_):
+    def test_uses_java_home_when_path_missing(self, _, access_mock, __):
         with patch.dict(os.environ, {'JAVA_HOME': '/opt/jdk'}):
             kernel = TLAPlusKernel()
             self.assertEqual(kernel.java_command()[0], '/opt/jdk/bin/java')
+            access_mock.assert_called_once_with('/opt/jdk/bin/java', os.X_OK)
 
     @patch('tlaplus_jupyter.kernel.shutil.which', return_value=None)
     @patch('tlaplus_jupyter.kernel.os.access', return_value=False)
