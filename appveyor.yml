@@ -9,4 +9,4 @@ install:
   - pip install .
   - python -m tlaplus_jupyter.install
 test_script:
-  - python setup.py test
+  - python -m unittest tests.test_notebook

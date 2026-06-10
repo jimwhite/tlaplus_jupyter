@@ -83,26 +83,26 @@ class TLAPlusKernel(Kernel):
             'user_expressions': {},
         }
 
-    def do_execute(self, payload, silent, store_history=True, user_expressions=None,
-                   allow_stdin=False):
+    def do_execute(self, code, silent, store_history=True, user_expressions=None,
+                   allow_stdin=False, cell_id=None):
         """Route execute request depending on type."""
 
         try:
             # module
-            if re.match(r'^\s*-----*\s*MODULE\s', payload):
-                return self.eval_module(payload)
+            if re.match(r'^\s*-----*\s*MODULE\s', code):
+                return self.eval_module(code)
 
             # run config
-            elif re.match(r'^\s*%tlc:', payload):
-                return self.eval_tlc_config(payload)
+            elif re.match(r'^\s*%tlc:', code):
+                return self.eval_tlc_config(code)
 
             # tollge log collection
-            elif re.match(r'^\s*%log', payload):
-                return self.toggle_log(payload)
+            elif re.match(r'^\s*%log', code):
+                return self.toggle_log(code)
 
             # otherwise treat payload as a constant expression
             else:
-                return self.eval_expr(payload)
+                return self.eval_expr(code)
 
         except Exception:
             return self.respond_with_error(traceback.format_exc())

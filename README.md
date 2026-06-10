@@ -16,7 +16,7 @@ Jupyter kernel for TLA⁺ and Pluscal specification languages.
 
 ## Installation
 
-`tlaplus_jupyter` is a python package installable with `pip`. Python 2 and 3 are supported. To install run:
+`tlaplus_jupyter` is a Python package installable with `pip`. Python 3.9+ is supported. To install run:
 
 ```
 pip install tlaplus_jupyter
@@ -65,6 +65,16 @@ Basic usage is explained in an [intro notebook](https://mybinder.org/v2/gh/kelvi
 ## Sharing executable models with Binder
 
 TLA⁺ models shared on Github can be easily made runnable by coping  [Dockerfile](Dockerfile) to the repository root. After that, URL to such repo can be used at [Binder](https://mybinder.org) to start a dynamic TLA⁺ environment.
+
+## Development
+
+The project now uses `pyproject.toml` (PEP 621/setuptools) for packaging. For local development:
+
+```bash
+pip install -e .[dev]
+python -m tlaplus_jupyter.install --user --tlc-exec-stats disable
+python -m unittest tests.test_notebook
+```
 
 ## Related Projects
 

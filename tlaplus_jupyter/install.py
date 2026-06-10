@@ -7,12 +7,10 @@ import sys
 import shutil
 import binascii
 
-from future.standard_library import install_aliases
-install_aliases()
 from urllib.request import urlretrieve
 
 from jupyter_client.kernelspec import KernelSpecManager
-from IPython.utils.tempdir import TemporaryDirectory
+from tempfile import TemporaryDirectory
 
 TOOLS_URI = "https://github.com/tlaplus/tlaplus/releases/download/v1.7.2/tla2tools.jar"
 
@@ -20,7 +18,6 @@ kernel_json = {
     "argv": [sys.executable, "-m", "tlaplus_jupyter", "-f", "{connection_file}"],
     "display_name": "TLA⁺",
     "language": "tla",
-    "codemirror_mode": "tlaplus"
 }
 
 def install_my_kernel_spec(user=True, prefix=None):

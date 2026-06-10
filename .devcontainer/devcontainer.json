@@ -1,0 +1,13 @@
+{
+  "name": "tlaplus_jupyter",
+  "image": "quay.io/jupyter/minimal-notebook:python-3.13",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y openjdk-17-jre-headless && pip install -e .[dev] && python -m tlaplus_jupyter.install --sys-prefix --tlc-exec-stats disable",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ]
+    }
+  }
+}
