@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tlaplus_jupyter"
+version = "0.1.1"
+description = "Jupyter kernel for TLA⁺"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Stas Kelvich", email = "stas.kelvich@gmail.com" },
+]
+keywords = ["jupyter", "tla", "tlaplus", "pluscal"]
+classifiers = [
+  "Topic :: Software Development :: Interpreters",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = [
+  "ipykernel>=6.29.0",
+  "jupyter-client>=8.6.0",
+  "psutil>=5.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "nbconvert>=7.16.0",
+  "nbformat>=5.10.0",
+  "notebook>=7.3.0",
+]
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+include = ["tlaplus_jupyter*"]
+
+[tool.setuptools.package-data]
+tlaplus_jupyter = ["assets/kernel.js"]
