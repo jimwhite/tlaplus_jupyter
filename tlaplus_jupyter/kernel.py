@@ -41,12 +41,40 @@ class TLAPlusKernel(Kernel):
         return workspace
 
     def java_command(self):
+        java = self.java_executable()
+        tla_tools = self.tla_tools_jar()
         return [
-            'java',
+            java,
             '-XX:+UseParallelGC',
             '-Dtlc2.TLC.ide=tlaplus_jupyter',
-            '-cp', os.path.join(self.vendor_path, 'tla2tools.jar')
+            '-cp', tla_tools
         ]
+
+    def java_executable(self):
+        java = shutil.which('java')
+        if java is not None:
+            return java
+
+        java_home = os.environ.get('JAVA_HOME')
+        if java_home:
+            java_home_bin = os.path.join(java_home, 'bin', 'java')
+            if os.path.isfile(java_home_bin) and os.access(java_home_bin, os.X_OK):
+                return java_home_bin
+
+        raise RuntimeError(
+            "Java executable not found. Ensure 'java' is on PATH or set JAVA_HOME."
+        )
+
+    def tla_tools_jar(self):
+        jar = os.path.join(self.vendor_path, 'tla2tools.jar')
+        if os.path.isfile(jar):
+            return jar
+
+        raise RuntimeError(
+            "Unable to find tla2tools.jar at '{}'. Run "
+            "'python -m tlaplus_jupyter.install' to download the TLA+ tools."
+            .format(jar)
+        )
 
     def run_proc(self, cmd, workspace):
         logging.info("run_proc started '%s'", cmd)
@@ -83,26 +111,26 @@ class TLAPlusKernel(Kernel):
             'user_expressions': {},
         }
 
-    def do_execute(self, payload, silent, store_history=True, user_expressions=None,
-                   allow_stdin=False):
+    def do_execute(self, code, silent, store_history=True, user_expressions=None,
+                   allow_stdin=False, cell_id=None):
         """Route execute request depending on type."""
 
         try:
             # module
-            if re.match(r'^\s*-----*\s*MODULE\s', payload):
-                return self.eval_module(payload)
+            if re.match(r'^\s*-----*\s*MODULE\s', code):
+                return self.eval_module(code)
 
             # run config
-            elif re.match(r'^\s*%tlc:', payload):
-                return self.eval_tlc_config(payload)
+            elif re.match(r'^\s*%tlc:', code):
+                return self.eval_tlc_config(code)
 
             # tollge log collection
-            elif re.match(r'^\s*%log', payload):
-                return self.toggle_log(payload)
+            elif re.match(r'^\s*%log', code):
+                return self.toggle_log(code)
 
             # otherwise treat payload as a constant expression
             else:
-                return self.eval_expr(payload)
+                return self.eval_expr(code)
 
         except Exception:
             return self.respond_with_error(traceback.format_exc())
