@@ -3,6 +3,9 @@ import nbformat
 
 from nbconvert.preprocessors import ExecutePreprocessor
 from unittest import TestCase
+from unittest.mock import patch
+
+from tlaplus_jupyter.kernel import TLAPlusKernel
 
 
 class TestNotebook(TestCase):
@@ -41,3 +44,27 @@ class TestNotebook(TestCase):
         self.assertEqual(cell.execution_count, 4)
         text = cell.outputs[0].text
         self.assertTrue('Could not parse ' in text)
+
+
+class TestJavaPathResolution(TestCase):
+
+    @patch('tlaplus_jupyter.kernel.shutil.which', return_value='/usr/bin/java')
+    def test_prefers_java_from_path(self, _):
+        kernel = TLAPlusKernel()
+        self.assertEqual(kernel.java_command()[0], '/usr/bin/java')
+
+    @patch('tlaplus_jupyter.kernel.shutil.which', return_value=None)
+    @patch('tlaplus_jupyter.kernel.os.access', return_value=True)
+    @patch('tlaplus_jupyter.kernel.os.path.isfile', return_value=True)
+    def test_uses_java_home_when_path_missing(self, *_):
+        with patch.dict(os.environ, {'JAVA_HOME': '/opt/jdk'}):
+            kernel = TLAPlusKernel()
+            self.assertEqual(kernel.java_command()[0], '/opt/jdk/bin/java')
+
+    @patch('tlaplus_jupyter.kernel.shutil.which', return_value=None)
+    @patch('tlaplus_jupyter.kernel.os.path.isfile', return_value=False)
+    def test_raises_when_java_missing(self, *_):
+        with patch.dict(os.environ, {}, clear=True):
+            kernel = TLAPlusKernel()
+            with self.assertRaisesRegex(RuntimeError, 'Java executable not found'):
+                kernel.java_command()

@@ -41,8 +41,21 @@ class TLAPlusKernel(Kernel):
         return workspace
 
     def java_command(self):
+        java = shutil.which('java')
+        if java is None:
+            java_home = os.environ.get('JAVA_HOME')
+            if java_home:
+                java_home_bin = os.path.join(java_home, 'bin', 'java')
+                if os.path.isfile(java_home_bin) and os.access(java_home_bin, os.X_OK):
+                    java = java_home_bin
+
+        if java is None:
+            raise RuntimeError(
+                "Java executable not found. Ensure 'java' is on PATH or set JAVA_HOME."
+            )
+
         return [
-            'java',
+            java,
             '-XX:+UseParallelGC',
             '-Dtlc2.TLC.ide=tlaplus_jupyter',
             '-cp', os.path.join(self.vendor_path, 'tla2tools.jar')
