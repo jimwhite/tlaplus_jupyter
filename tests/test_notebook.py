@@ -54,12 +54,21 @@ class TestJavaPathResolution(TestCase):
         self.assertEqual(kernel.java_command()[0], '/usr/bin/java')
 
     @patch('tlaplus_jupyter.kernel.shutil.which', return_value=None)
-    @patch('tlaplus_jupyter.kernel.os.access', return_value=True)
+    @patch('tlaplus_jupyter.kernel.os.access', side_effect=lambda _, mode: mode == os.X_OK)
     @patch('tlaplus_jupyter.kernel.os.path.isfile', return_value=True)
     def test_uses_java_home_when_path_missing(self, *_):
         with patch.dict(os.environ, {'JAVA_HOME': '/opt/jdk'}):
             kernel = TLAPlusKernel()
             self.assertEqual(kernel.java_command()[0], '/opt/jdk/bin/java')
+
+    @patch('tlaplus_jupyter.kernel.shutil.which', return_value=None)
+    @patch('tlaplus_jupyter.kernel.os.access', return_value=False)
+    @patch('tlaplus_jupyter.kernel.os.path.isfile', return_value=True)
+    def test_raises_when_java_home_is_not_executable(self, *_):
+        with patch.dict(os.environ, {'JAVA_HOME': '/opt/jdk'}):
+            kernel = TLAPlusKernel()
+            with self.assertRaisesRegex(RuntimeError, 'Java executable not found'):
+                kernel.java_command()
 
     @patch('tlaplus_jupyter.kernel.shutil.which', return_value=None)
     @patch('tlaplus_jupyter.kernel.os.path.isfile', return_value=False)
