@@ -18,6 +18,9 @@ kernel_json = {
     "argv": [sys.executable, "-m", "tlaplus_jupyter", "-f", "{connection_file}"],
     "display_name": "TLA⁺",
     "language": "tla",
+    "metadata": {
+        "codemirror_mode": "tlaplus",
+    },
 }
 
 def install_my_kernel_spec(user=True, prefix=None):
