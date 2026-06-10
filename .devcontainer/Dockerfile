@@ -10,6 +10,9 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /workspaces/tlaplus_jupyter \
+    && chown -R ${NB_UID}:${NB_GID} /workspaces/tlaplus_jupyter
+
 WORKDIR /workspaces/tlaplus_jupyter
 COPY --chown=${NB_UID}:${NB_GID} . /workspaces/tlaplus_jupyter
 
