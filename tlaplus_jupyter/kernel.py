@@ -41,25 +41,40 @@ class TLAPlusKernel(Kernel):
         return workspace
 
     def java_command(self):
-        java = shutil.which('java')
-        if java is None:
-            java_home = os.environ.get('JAVA_HOME')
-            if java_home:
-                java_home_bin = os.path.join(java_home, 'bin', 'java')
-                if os.path.isfile(java_home_bin) and os.access(java_home_bin, os.X_OK):
-                    java = java_home_bin
-
-        if java is None:
-            raise RuntimeError(
-                "Java executable not found. Ensure 'java' is on PATH or set JAVA_HOME."
-            )
-
+        java = self.java_executable()
+        tla_tools = self.tla_tools_jar()
         return [
             java,
             '-XX:+UseParallelGC',
             '-Dtlc2.TLC.ide=tlaplus_jupyter',
-            '-cp', os.path.join(self.vendor_path, 'tla2tools.jar')
+            '-cp', tla_tools
         ]
+
+    def java_executable(self):
+        java = shutil.which('java')
+        if java is not None:
+            return java
+
+        java_home = os.environ.get('JAVA_HOME')
+        if java_home:
+            java_home_bin = os.path.join(java_home, 'bin', 'java')
+            if os.path.isfile(java_home_bin) and os.access(java_home_bin, os.X_OK):
+                return java_home_bin
+
+        raise RuntimeError(
+            "Java executable not found. Ensure 'java' is on PATH or set JAVA_HOME."
+        )
+
+    def tla_tools_jar(self):
+        jar = os.path.join(self.vendor_path, 'tla2tools.jar')
+        if os.path.isfile(jar):
+            return jar
+
+        raise RuntimeError(
+            "Unable to find tla2tools.jar at '{}'. Run "
+            "'python -m tlaplus_jupyter.install' to download the TLA+ tools."
+            .format(jar)
+        )
 
     def run_proc(self, cmd, workspace):
         logging.info("run_proc started '%s'", cmd)
