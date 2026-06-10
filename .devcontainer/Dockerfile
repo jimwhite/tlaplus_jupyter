@@ -1,8 +1,5 @@
 FROM quay.io/jupyter/minimal-notebook:python-3.13
 
-ARG NB_UID=1000
-ARG NB_GID=100
-
 USER root
 
 RUN apt-get update \
@@ -10,13 +7,10 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /workspaces/tlaplus_jupyter \
-    && chown -R ${NB_UID}:${NB_GID} /workspaces/tlaplus_jupyter
+USER ${NB_UID}
 
 WORKDIR /workspaces/tlaplus_jupyter
 COPY --chown=${NB_UID}:${NB_GID} . /workspaces/tlaplus_jupyter
-
-USER ${NB_UID}
 
 RUN pip install -e .[dev] \
     && python -m tlaplus_jupyter.install --sys-prefix --tlc-exec-stats disable
