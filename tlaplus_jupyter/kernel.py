@@ -66,13 +66,18 @@ class TLAPlusKernel(Kernel):
         )
 
     def tla_tools_jar(self):
+        env_jar = os.environ.get('TLAPLUS_JUPYTER_TLA2TOOLS_JAR')
+        if env_jar and os.path.isfile(env_jar):
+            return env_jar
+
         jar = os.path.join(self.vendor_path, 'tla2tools.jar')
         if os.path.isfile(jar):
             return jar
 
         raise RuntimeError(
-            "Unable to find tla2tools.jar at '{}'. Run "
-            "'python -m tlaplus_jupyter.install' to download the TLA+ tools."
+            "Unable to find tla2tools.jar. Run "
+            "'python -m tlaplus_jupyter.install' to download the TLA+ tools, "
+            "or set TLAPLUS_JUPYTER_TLA2TOOLS_JAR to its path. Checked '{}'."
             .format(jar)
         )
 
