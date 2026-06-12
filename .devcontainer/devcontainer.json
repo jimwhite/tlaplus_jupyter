@@ -1,6 +1,13 @@
 {
   "name": "tlaplus_jupyter",
   "image": "ghcr.io/jimwhite/tlaplus_jupyter:latest",
+  "forwardPorts": [8888],
+  "portsAttributes": {
+    "8888": {
+      "label": "Jupyter",
+      "onAutoForward": "openBrowserOnce"
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
