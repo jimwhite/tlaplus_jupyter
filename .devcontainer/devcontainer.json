@@ -1,9 +1,6 @@
 {
   "name": "tlaplus_jupyter",
-  "build": {
-    "context": "..",
-    "dockerfile": "Dockerfile"
-  },
+  "image": "ghcr.io/jimwhite/tlaplus_jupyter:latest",
   "customizations": {
     "vscode": {
       "extensions": [
