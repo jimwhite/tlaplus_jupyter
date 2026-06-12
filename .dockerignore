@@ -1,0 +1,12 @@
+.git
+.ipynb_checkpoints
+**/.ipynb_checkpoints
+__pycache__
+**/__pycache__
+*.pyc
+*.egg-info
+build
+dist
+MANIFEST
+tlaplus_jupyter/vendor/tla2tools.jar
+Untitled*.ipynb
